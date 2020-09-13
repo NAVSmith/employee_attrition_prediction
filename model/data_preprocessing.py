@@ -8,10 +8,11 @@
 
 # imports
 import sys
+import os
+import json
 
 import pandas as pd
 import numpy as np
-from sklearn import preprocessing
 
 
 class Base_data_preprocessing:
@@ -134,9 +135,9 @@ class Base_data_preprocessing:
         print(self.features_name, self.features_data)
 
 
-        # seving the processed file
-        #self.save_prepossed_dataset()
-        #print('prepossessing is done')
+        #seving the processed file
+        self.save_prepossed_dataset()
+        print('prepossessing is done')
 
 
 
@@ -159,8 +160,8 @@ class Base_data_preprocessing:
         :param lst_columns:
         :return:
         """
-        self.feature_transformation_log[col]['max'] = max
-        self.feature_transformation_log[col]['min'] = min
+        self.feature_transformation_log[col]['max'] = str(max)
+        self.feature_transformation_log[col]['min'] = str(min)
 
     def add_string_metadata(self, col, string_dict, dict_values):
         """
@@ -169,11 +170,6 @@ class Base_data_preprocessing:
         :return:
         """
         self.feature_transformation_log[col][string_dict] = dict_values
-
-
-
-
-
 
 
     #### general functions
@@ -205,11 +201,21 @@ class Base_data_preprocessing:
 
         :return:
         """
-        file_name = input('please enter name for the file: ')
+        data_dir_name = input('please enter name for the dirctory the trasformed_dataset will be saved: ')
         # enter later avlidation mach that the names are not allready exsit
-        path = self.directory_path_processed + file_name + '.json'
+        path = self.directory_path_processed + data_dir_name
+        os.mkdir(path)
         print(f'saving to: {path}')
-        self.df.to_json(path)
+        self.label_data
+        # saving label data
+        np.savetxt(path+"/label.csv", self.label_data, delimiter=",")
+        # saving features data
+        np.savetxt(path + "/features.csv", self.features_data, delimiter=",")
+        #
+        with open(path + '/metadata.json', 'w') as json_file:
+            json.dump(self.feature_transformation_log, json_file)
+
+
 
     def handel_label_column(self):
         """
@@ -246,16 +252,6 @@ class Base_data_preprocessing:
         else:
             print('something went wrong lets start again')
             self.handel_label_column()
-
-
-
-
-
-
-
-
-
-
 
 
     #### function for handeling missing values
@@ -359,7 +355,7 @@ class Base_data_preprocessing:
             # seting the values in the columns
             self.set_numeric_value_for_a_string(col, value, numeric_value)
             # adding key value to oridnal dict
-            ordinal_dict[value] = numeric_value
+            ordinal_dict[value] = str(numeric_value)
         # entering the values and the numeric values into the metadata
         self.add_string_metadata(col, 'ordinal_trasformtion', ordinal_dict)
         # cast at flloat32
