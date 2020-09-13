@@ -6,9 +6,6 @@
 ########################################
 
 # imports
-import sys
-
-
 import numpy as np
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
@@ -47,7 +44,7 @@ class Split_data:
         raw_features, raw_label = self.load_data()
 
         # splitting the data
-        raw_train_features, raw_train_label = self.spliting_the_data(raw_features, raw_label)
+        self.spliting_the_data(raw_features, raw_label)
         # dumping the big files to make room in the ram
         del raw_features, raw_label
 
@@ -56,6 +53,9 @@ class Split_data:
 
         if not self.train_is_data_balanced:
             self.balance_train_data()
+
+        print('x_val:' ,self.x_val,
+              self.y_val, self.x_train, self.y_train)
 
 
 
@@ -68,7 +68,7 @@ class Split_data:
         # file_name = input('please enter name of the data file: ')
         print(self.path)
         try:
-            raw_label = np.genfromtxt(self.path + 'label.csv', delimiter=',')
+            raw_label = np.genfromtxt(self.path + 'label.csv', delimiter=',' )
             print(raw_label[0])
             raw_features = np.genfromtxt(self.path + 'features.csv', delimiter=',')
             print(raw_features[0])
@@ -87,11 +87,10 @@ class Split_data:
         # using sklearn to split
         # seving the validate data into the class as it will no change
         print('spliting data')
-        self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(features_data,
+        self.x_train_unblanced, self.x_val, self.y_train_unblanced, self.y_val = train_test_split(features_data,
                                                           label_data,
                                                           test_size=.2,
                                                           random_state=12)
-        return x_train, y_train
 
 
     def check_if_data_is_balanced(self, labels_data):
@@ -100,15 +99,18 @@ class Split_data:
         :param labels_data:
         :return:
         """
+        """
         #fix it if there time
         unique_val = list(np.unique(labels_data, return_counts=True))
         label_zero = zip(unique_val[0][0], unique_val[1][0])
         label_one = zip(unique_val[0][1], unique_val[1][1])
         print(label_zero, label_one)
+        """
+        pass
 
 
     def balance_train_data(self):
         # resampling the traninging data to change the balnce the data
         sm = SMOTE(random_state=12)
-        self.x_train, self.x_train = sm.fit_sample(self.x_train, self.y_train)
+        self.x_train, self.y_train = sm.fit_sample(self.x_train_unblanced, self.y_train_unblanced)
         self.train_is_data_balanced = True

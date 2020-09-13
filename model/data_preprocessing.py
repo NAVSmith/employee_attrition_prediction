@@ -21,8 +21,7 @@ class Base_data_preprocessing:
     """
     # general att
     directory_path = './../data/'
-    directory_path_processed = directory_path+'/processed_files/'
-
+    directory_path_processed = directory_path + '/processed_files/'
 
     # init
     def __init__(self, data_path):
@@ -34,15 +33,13 @@ class Base_data_preprocessing:
         # key_infomration
         self.label_data = None
         self.label_name = None
-        self.features = None
+        self.features_data = None
         self.features_name = None
         self.columns_names = None
-
 
         # column transformation log
         # to be used to transform the data to be evelauated
         self.feature_transformation_log = {}
-
 
         print('loading data ...')
         # loading to pandas
@@ -50,7 +47,6 @@ class Base_data_preprocessing:
         self.columns_names = list(self.df.columns)
 
         print('data set in loaded ...')
-
 
         # checking and handeling missing values
 
@@ -63,22 +59,16 @@ class Base_data_preprocessing:
             print(f'Imputation is needed, the data handling might not work. Model requires a clean data set')
             sys.exit()
 
-
         # handeling the label column
         self.handel_label_column()
 
-        # make sure that there the label is not in the features and set the values
-        self.features_name = self.df.columns
-        if self.label_name not in self.features_name:
-            self.features_data = self.df.values
-        else:
-            self.handel_label_column()
 
+
+        # the column of the label was drop so the rest of the data is feature data
+        self.features_name = list(self.df.columns)
         # handeling feature columns
         for col in self.features_name:
             self.feature_transformation_log[col] = {}
-
-
 
         # setting the numeric columns
         self.numeric_columns = self.find_features_with_type('numeric')
@@ -91,8 +81,6 @@ class Base_data_preprocessing:
         self.add_columns_type_to_metadata(self.string_columns, 'string')
 
         print(self.feature_transformation_log)
-
-
 
         # normalizing the numeric columns
         print(f'normalizing numeric columns: {self.numeric_columns}')
@@ -110,7 +98,6 @@ class Base_data_preprocessing:
         # handeling string columns
         # by asking for user input
 
-
         self.num_of_string_columns = len(self.string_columns)
         print(f'there are {self.num_of_string_columns} string columns in the data-set')
         if self.num_of_string_columns == 0:
@@ -119,30 +106,20 @@ class Base_data_preprocessing:
             print('will have to handel it')
         self.handel_string_columns()
 
-        print(self.feature_transformation_log)
+        # set the feature_data as the new data frame after the treament and the droping of the label column
+        self.features_data = self.df
 
-        # set feature names and data
-        # make sure that there the label is not in the features and set the values
-        self.features_name = self.df.columns
-        if self.label_name not in self.features_name:
-            self.features_data = self.df.values
-        else:
-            self.handel_label_column()
+        print(self.feature_transformation_log)
 
         print(self.label_name, self.label_data)
 
-
         print(self.features_name, self.features_data)
 
-
-        #seving the processed file
+        # seving the processed file
         self.save_prepossed_dataset()
         print('prepossessing is done')
 
-
-
     # meta data functions
-
 
     def add_columns_type_to_metadata(self, lst_columns, type):
         """
@@ -152,7 +129,6 @@ class Base_data_preprocessing:
         """
         for col_name in lst_columns:
             self.feature_transformation_log[col_name]['type'] = type
-
 
     def add_max_min_to_metadata(self, col, max, min):
         """
@@ -171,7 +147,6 @@ class Base_data_preprocessing:
         """
         self.feature_transformation_log[col][string_dict] = dict_values
 
-
     #### general functions
 
     def find_features_with_type(self, col_type):
@@ -187,7 +162,7 @@ class Base_data_preprocessing:
             types_to_look = ['float64', 'int64']
         elif col_type == 'string':
             types_to_look = ['object']
-        elif  col_type == 'bool':
+        elif col_type == 'bool':
             types_to_look = ['bool']
         else:
             print(f'{col_type} is not supported')
@@ -206,16 +181,13 @@ class Base_data_preprocessing:
         path = self.directory_path_processed + data_dir_name
         os.mkdir(path)
         print(f'saving to: {path}')
-        self.label_data
-        # saving label data
-        np.savetxt(path+"/label.csv", self.label_data, delimiter=",")
+        # saving label dat
+        self.label_data.to_csv(path + "/label.csv", index=False, header=False)
         # saving features data
-        np.savetxt(path + "/features.csv", self.features_data, delimiter=",")
+        self.features_data.to_csv(path + "/features.csv", index=False, header=False)
         #
         with open(path + '/metadata.json', 'w') as json_file:
             json.dump(self.feature_transformation_log, json_file)
-
-
 
     def handel_label_column(self):
         """
@@ -243,7 +215,7 @@ class Base_data_preprocessing:
             # cast as a float
             self.cast_as_float(self.label_name)
             # set as label and save as np array
-            self.label_data = self.df[self.label_name].values
+            self.label_data = self.df[self.label_name]
 
             # drop the column form the dataset
             self.df.drop(columns=[self.label_name], inplace=True)
@@ -253,19 +225,14 @@ class Base_data_preprocessing:
             print('something went wrong lets start again')
             self.handel_label_column()
 
-
     #### function for handeling missing values
 
     def handel_nan_values(self):
         pass
 
-
-
     #### function for numeric columns handeling
 
-
-
-    def normalize_and_cast_to_float(self, col, float_dtype='32', is_train_data = False):
+    def normalize_and_cast_to_float(self, col, float_dtype='32', is_train_data=False):
         """
 
         normalizng a column and re
@@ -287,7 +254,6 @@ class Base_data_preprocessing:
         # if is train data save it in the medadata dict
         self.add_max_min_to_metadata(col=col, max=max_value, min=min_value)
 
-
     def cast_as_float(self, col, float_type='32'):
         """
         change colum as to float
@@ -296,10 +262,10 @@ class Base_data_preprocessing:
         :return: None
         """
         ## change it the try epect logic
-        str_type = 'float'+float_type
+        str_type = 'float' + float_type
         if float_type == '32' or float_type == '16' or float_type == '64':
             self.df[col] = self.df[col].astype(str_type)
-        else :
+        else:
             print('not a valid float type, enter 16, 32, or 64')
 
     ### function for handeling string columns
@@ -310,7 +276,6 @@ class Base_data_preprocessing:
         :return:
         """
         valid_encoding = ['ordinal', 'one_hot']
-
 
         for col in self.string_columns:
             print(f'handeling {col}', '\n')
@@ -330,8 +295,6 @@ class Base_data_preprocessing:
             elif how_to_handel == 'ordinal':
                 self.ordinal_encoding(col)
 
-
-
     def ordinal_encoding(self, col):
         """
 
@@ -341,6 +304,9 @@ class Base_data_preprocessing:
         column_values = self.df[col].copy().unique()
         print(f'ordenial encoding encoding {col}')
         print(f'these are {column_values}\nlet loop on them and set a numeric value for each one')
+        # setting the new numeric value
+        col_numeric_name = col + '_numeric'
+        self.df[col_numeric_name] = 0.0
         ordinal_dict = {}
         for value in column_values:
             numeric_value = None
@@ -353,19 +319,21 @@ class Base_data_preprocessing:
                     numeric_value = input(f'no a valid input, only numeric values')
                     numeric_value = None
             # seting the values in the columns
-            self.set_numeric_value_for_a_string(col, value, numeric_value)
+            self.set_numeric_value_for_a_string(col, col_numeric_name, value, numeric_value)
             # adding key value to oridnal dict
             ordinal_dict[value] = str(numeric_value)
         # entering the values and the numeric values into the metadata
         self.add_string_metadata(col, 'ordinal_trasformtion', ordinal_dict)
         # cast at flloat32
-        self.cast_as_float(col, float_type='32')
+        self.cast_as_float(col_numeric_name, float_type='32')
 
         # dropping the orginal column
         self.df.drop(columns=col, inplace=True)
 
+        # entering the column to the feature name columns
+        self.features_name.append(col_numeric_name)
 
-    def set_numeric_value_for_a_string(self, col, value, numeric_value):
+    def set_numeric_value_for_a_string(self, orignal_col, numeric_col, value, numeric_value):
         """
 
         :param col: the column to change the values in
@@ -373,9 +341,8 @@ class Base_data_preprocessing:
         :param numeric_value: numeric value to chnage the value into
         :return:
         """
-        self.df.loc[self.df[col] == value, col] = str(numeric_value)
 
-
+        self.df.loc[self.df[orignal_col] == value, numeric_col] = numeric_value
 
     def one_hot_encoding(self, col):
         """
@@ -399,7 +366,3 @@ class Base_data_preprocessing:
         self.add_string_metadata(col, 'one_hot_encoding', values_for_dict)
 
         print('done')
-
-
-
-
