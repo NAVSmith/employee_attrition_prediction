@@ -29,11 +29,27 @@ class Base_data_preprocessing:
 
         :param data_path: csv path
         """
+
+        # key_infomration
+        self.label_data = None
+        self.label_name = None
+        self.features = None
+        self.features_name = None
+        self.columns_names = None
+
+
+        # column transformation log
+        # to be used to transform the data to be evelauated
+        self.feature_transformation_log = {}
+
+
         print('loading data ...')
         # loading to pandas
         self.df = pd.read_csv(data_path)
+        self.columns_names = list(self.df.columns)
 
         print('data set in loaded ...')
+
 
         # checking and handeling missing values
 
@@ -47,14 +63,33 @@ class Base_data_preprocessing:
             sys.exit()
 
 
+        # handeling the label column
+        self.handel_label_column()
+
+        # make sure that there the label is not in the features and set the values
+        self.features_name = self.df.columns
+        if self.label_name not in self.features_name:
+            self.features_data = self.df.values
+        else:
+            self.handel_label_column()
+
+        # handeling feature columns
+        for col in self.features_name:
+            self.feature_transformation_log[col] = {}
+
 
 
         # setting the numeric columns
-        self.numeric_columns = self.find_columns_with_type('numeric')
+        self.numeric_columns = self.find_features_with_type('numeric')
+        self.add_columns_type_to_metadata(self.numeric_columns, 'numeric')
         # setting bool columns
-        self.bool_columns = self.find_columns_with_type('bool')
+        self.bool_columns = self.find_features_with_type('bool')
+        self.add_columns_type_to_metadata(self.bool_columns, 'bool')
         # setting string columns
-        self.string_columns = self.find_columns_with_type('string')
+        self.string_columns = self.find_features_with_type('string')
+        self.add_columns_type_to_metadata(self.string_columns, 'string')
+
+        print(self.feature_transformation_log)
 
 
 
@@ -69,6 +104,8 @@ class Base_data_preprocessing:
         else:
             print('there are no bool columns moving on')
 
+        print(self.feature_transformation_log)
+
         # handeling string columns
         # by asking for user input
 
@@ -79,13 +116,59 @@ class Base_data_preprocessing:
             print('nothing to handel will move on')
         else:
             print('will have to handel it')
-
         self.handel_string_columns()
 
-        # seving the processed file
-        self.save_prepossed_dataset()
-        print('prepossessing is done')
+        print(self.feature_transformation_log)
 
+        # set feature names and data
+        # make sure that there the label is not in the features and set the values
+        self.features_name = self.df.columns
+        if self.label_name not in self.features_name:
+            self.features_data = self.df.values
+        else:
+            self.handel_label_column()
+
+        print(self.label_name, self.label_data)
+
+
+        print(self.features_name, self.features_data)
+
+
+        # seving the processed file
+        #self.save_prepossed_dataset()
+        #print('prepossessing is done')
+
+
+
+    # meta data functions
+
+
+    def add_columns_type_to_metadata(self, lst_columns, type):
+        """
+        :param type
+        :param lst_columns:
+        :return:
+        """
+        for col_name in lst_columns:
+            self.feature_transformation_log[col_name]['type'] = type
+
+
+    def add_max_min_to_metadata(self, col, max, min):
+        """
+
+        :param lst_columns:
+        :return:
+        """
+        self.feature_transformation_log[col]['max'] = max
+        self.feature_transformation_log[col]['min'] = min
+
+    def add_string_metadata(self, col, string_dict, dict_values):
+        """
+
+        :param col:
+        :return:
+        """
+        self.feature_transformation_log[col][string_dict] = dict_values
 
 
 
@@ -95,7 +178,7 @@ class Base_data_preprocessing:
 
     #### general functions
 
-    def find_columns_with_type(self, col_type):
+    def find_features_with_type(self, col_type):
         """
 
         :param col_type: can be numeric, string or bool
@@ -124,9 +207,52 @@ class Base_data_preprocessing:
         """
         file_name = input('please enter name for the file: ')
         # enter later avlidation mach that the names are not allready exsit
-        path = self.directory_path_processed + file_name + '.csv'
+        path = self.directory_path_processed + file_name + '.json'
         print(f'saving to: {path}')
-        self.df.to_csv(path)
+        self.df.to_json(path)
+
+    def handel_label_column(self):
+        """
+        asking the user to name the label column and returing the data handeled as a float32 var, and dropping the columns for the data Frame
+        :return:
+        """
+        # reset the label column name
+        self.label_name = None
+        print('these are the columns names in the dataset:')
+        for col in self.columns_names:
+            print(col)
+        self.label_name = input('please enter the label columns: ')
+        # check if columns in DataFrame
+        if self.label_name in self.columns_names and self.label_name is not None:
+            print(f'{self.label_name} is in dataset')
+        else:
+            print('not a valid columns name')
+            self.handel_label_column()
+
+        # check if columns is numeric
+        if self.df[self.label_name].dtype in ['float64', 'int64', 'int32', 'float32', 'bool']:
+            print(f'{self.label_name} is a valid numeric column')
+            # in the future enter more checks to make sure it is the right kond of columns
+
+            # cast as a float
+            self.cast_as_float(self.label_name)
+            # set as label and save as np array
+            self.label_data = self.df[self.label_name].values
+
+            # drop the column form the dataset
+            self.df.drop(columns=[self.label_name], inplace=True)
+
+
+        else:
+            print('something went wrong lets start again')
+            self.handel_label_column()
+
+
+
+
+
+
+
 
 
 
@@ -143,10 +269,13 @@ class Base_data_preprocessing:
 
 
 
-    def normalize_and_cast_to_float(self, col, float_dtype='32'):
+    def normalize_and_cast_to_float(self, col, float_dtype='32', is_train_data = False):
         """
+
         normalizng a column and re
+        :param float_dtype
         :param col:
+        :param is_train_data : if it is train data will add the infomration to datalog
         :return:
         """
         print(col)
@@ -155,9 +284,12 @@ class Base_data_preprocessing:
         min_value = column_array.min()
         delimiter = max_value - min_value
         transformed_array = (column_array - min_value) / delimiter
-        print()
+
         self.df[col] = transformed_array
         self.cast_as_float(col, float_type=float_dtype)
+
+        # if is train data save it in the medadata dict
+        self.add_max_min_to_metadata(col=col, max=max_value, min=min_value)
 
 
     def cast_as_float(self, col, float_type='32'):
@@ -213,6 +345,7 @@ class Base_data_preprocessing:
         column_values = self.df[col].copy().unique()
         print(f'ordenial encoding encoding {col}')
         print(f'these are {column_values}\nlet loop on them and set a numeric value for each one')
+        ordinal_dict = {}
         for value in column_values:
             numeric_value = None
             while numeric_value == None:
@@ -223,28 +356,18 @@ class Base_data_preprocessing:
                 except ValueError:
                     numeric_value = input(f'no a valid input, only numeric values')
                     numeric_value = None
+            # seting the values in the columns
             self.set_numeric_value_for_a_string(col, value, numeric_value)
+            # adding key value to oridnal dict
+            ordinal_dict[value] = numeric_value
+        # entering the values and the numeric values into the metadata
+        self.add_string_metadata(col, 'ordinal_trasformtion', ordinal_dict)
         # cast at flloat32
         self.cast_as_float(col, float_type='32')
 
         # dropping the orginal column
         self.df.drop(columns=col, inplace=True)
-        
-        
-        """
-        # making the dummies dataframe
-        one_hot = pd.get_dummies(self.df[col])
-        # dropping the orginal column
-        self.df.drop(columns=col, inplace=True)
-        print(one_hot.shape[1])
-        # turing all the bool columns that where made in the dummies dataframe into float32
-        for one_hot_col in one_hot.columns:
-            one_hot[one_hot_col] = one_hot[one_hot_col].astype('float32')
-        # adding the dummies dataframe to the original datafarme
-        self.df = self.df.join(one_hot)
 
-        print('done')
-        """
 
     def set_numeric_value_for_a_string(self, col, value, numeric_value):
         """
@@ -265,6 +388,7 @@ class Base_data_preprocessing:
         :return:
         """
         print(f'one hot encoding {col}')
+        values_for_dict = list(self.df[col].unique())
         # making the dummies dataframe
         one_hot = pd.get_dummies(self.df[col])
         # dropping the orginal column
@@ -275,6 +399,8 @@ class Base_data_preprocessing:
             one_hot[one_hot_col] = one_hot[one_hot_col].astype('float32')
         # adding the dummies dataframe to the original datafarme
         self.df = self.df.join(one_hot)
+        # adding the values as a dict to the metadata
+        self.add_string_metadata(col, 'one_hot_encoding', values_for_dict)
 
         print('done')
 
