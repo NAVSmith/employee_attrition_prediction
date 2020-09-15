@@ -28,7 +28,8 @@ class Transform_input:
         file_path = self.path + file
         with open(file_path, 'r') as file:
             data = json.load(file)
-            featuers = data.keys())
+            features = data.keys()
+            print(features)
 
 
 
