@@ -16,7 +16,7 @@ class Split_data:
     then splitting to train and validate
     """
     directory_path = './../data/'
-    directory_path_processed = directory_path + '/processed_files/'
+    directory_path_processed = directory_path + 'processed_files/'
 
     # init function
 
