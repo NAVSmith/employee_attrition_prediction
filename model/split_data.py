@@ -72,9 +72,10 @@ class Split_data:
             print(raw_label[0])
             raw_features = np.genfromtxt(self.path + 'features.csv', delimiter=',')
             print(raw_features[0])
-        except:
+        except Exception as e:
             # make this more detailed
             print('something went wrong please enter a valid scv file form the processed_files directory')
+            print(e)
         return raw_features, raw_label
 
 

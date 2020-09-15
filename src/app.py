@@ -8,6 +8,7 @@ def hello_world():
    return render_template('index.html')
 
 
+
 @app.route('/input', methods=['POST'])
 def get_input():
    print(request.data)
