@@ -33,8 +33,7 @@ class Predict:
 
         self.array_to_evaluate = self.turn_data_to_tensor(data_to_predict)
 
-        risk_output = self.predict_churn_prob(self.model, self.array_to_evaluate)
-
+        self.risk_output = self.predict_churn_prob(self.model, self.array_to_evaluate)
 
     def turn_data_to_tensor(self, array_to_change):
         """
