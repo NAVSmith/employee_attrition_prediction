@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, redirect, json
+
+#imports
 import tensorflow as tf
+from flask import Flask, render_template, request, redirect, json
+
 from call_prediction_dl import Predict
 
 app = Flask(__name__)
@@ -19,8 +22,8 @@ input
     "time_spend_company": 15, (1-99)
     "work_accident": 1, (no/yes)
     "promotion": 0, (no/yes)
-    "salary": "medium", (low/medium/high)
-    "department": "technical" (list, e.g "technical", "hr")
+    "department": "technical" (list, e.g "technical", "hr"
+    "salary": "medium", (low/medium/high))
 }
 """
 @app.route('/input', methods=['POST'])
@@ -33,6 +36,7 @@ def get_input():
    # time_spend_company = req_data['time_spend_company']
    # work_accident = req_data['work_accident']
    print(f'req_data is {req_data}')
+   print(type(req_data))
    # print(f'satisfaction is {satisfaction}')
    # extract input from the payload
    # e.g input = '{"satisfaction":0.74,"evaluation":0.92,"number_of_projects":4,"average_montly_hours":261,"time_spend_company":5,"work_accident":0,"churn":1,"promotion":0,"department":"technical","salary":"medium"}'
