@@ -70,6 +70,8 @@ class Base_data_preprocessing:
         for col in self.features_name:
             self.feature_transformation_log[col] = {}
 
+        """ENTER TRY TO CAST TO BOOL HERE"""
+
         # setting the numeric columns
         self.numeric_columns = self.find_features_with_type('numeric')
         self.add_columns_type_to_metadata(self.numeric_columns, 'numeric')
