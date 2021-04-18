@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>employee_attrition_prediction</title>
+</head>
+<body>
+<header>
+    <h1>workers attrition</h1>
+</header>
+<main>
+
+    <form action="/input" method="post">
+        <input name="satisfaction" type="number" value="0">
+        <input name="evaluation" type="number" value="0">
+        <input name="number_of_projects" type="number" value="0">
+        <input name="average_montly_hours" type="number" value="0">
+        <input name="time_spend_company" type="number" value="0">
+        <select name="work_accident">
+            <option>yes</option>
+            <option>no</option>
+        </select>
+        <select name="promotion">
+            <option>yes</option>
+            <option>no</option>
+        </select>
+        <select name="salary">
+            <option>low</option>
+            <option>medium</option>
+            <option>high</option>
+        </select>
+        <select name="department">
+            <option>sales</option>
+            <option>accounting</option>
+            <option>hr</option>
+            <option>technical</option>
+            <option>support</option>
+            <option>management</option>
+            <option>IT</option>
+            <option>product_mng</option>
+            <option>marketing</option>
+            <option>RandD</option>
+        </select>
+        <button type = "submit">submit</button>
+    </form>
+</main>
+
+</body>
+</html>
