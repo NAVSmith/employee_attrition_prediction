@@ -43,8 +43,9 @@
             </p>
         <form action="/input" method="POST">
             <h2>Enter the employee information here:</h2>
-            <input name="satisfaction" type="number" value="0">
-            <span>Enter <strong>satisfaction</strong> rating from <em>0 to 100</em></span>
+            <label for="satisfaction">Enter <strong>satisfaction</strong> rating from <em>0 to 100</em></label>
+            <br>
+            <input name="satisfaction" type="number" id="satisfaction" step="1"  value="0">
             <br>
             <br>
             <input name="evaluation" type="number" value="0">
