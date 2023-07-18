@@ -7,43 +7,96 @@
 <body>
 <header>
     <h1>workers attrition</h1>
+        <p>
+            this project is ....
+        </p>
 </header>
 <main>
+    <div id="intro">
+        <h2>Enter the employee information here:</h2>
+            <p>
+                follow the instruction
+                take the following information:
+                <br>
+                <ul>
+                    <li>satisfaction</li>
+                    <li>evaluation</li>
+                    <li>number of projects the employee worked on</li>
+                    <li>average monthly hours he worked on</li>
+                    <li>how long he worked in the company (in years) </li>
+                    <li>whether or not he had work accident</li>
+                    <li>whether or not he ׳was promoted in the last 3 years</li>
+                    <li>his salary rank('low', 'medium', 'high')</li>
+                    <li>his department (from the list)</li>
+                </ul>
+                <br>
+                the following points are pivotal for an accurate risk assessment and should always be entered.
+                Not entering them will not yield a result:
+                <ol>
+                    <li>satisfaction</li>
+                    <li>evaluation</li>
+                </ol>
 
-    <form action="/input" method="post">
-        <input name="satisfaction" type="number" value="0">
-        <input name="evaluation" type="number" value="0">
-        <input name="number_of_projects" type="number" value="0">
-        <input name="average_montly_hours" type="number" value="0">
-        <input name="time_spend_company" type="number" value="0">
-        <select name="work_accident">
-            <option>yes</option>
-            <option>no</option>
-        </select>
-        <select name="promotion">
-            <option>yes</option>
-            <option>no</option>
-        </select>
-        <select name="salary">
-            <option>low</option>
-            <option>medium</option>
-            <option>high</option>
-        </select>
-        <select name="department">
-            <option>sales</option>
-            <option>accounting</option>
-            <option>hr</option>
-            <option>technical</option>
-            <option>support</option>
-            <option>management</option>
-            <option>IT</option>
-            <option>product_mng</option>
-            <option>marketing</option>
-            <option>RandD</option>
-        </select>
-        <button type = "submit">submit</button>
-    </form>
+    </div>
+    <hr>
+    <section id="input form">
+            </p>
+        <form action="/input" method="POST">
+            <h2>Enter the employee information here:</h2>
+            <label for="satisfaction">Enter <strong>satisfaction</strong> rating from <em>0 to 100</em></label>
+            <br>
+            <input name="satisfaction" type="number" id="satisfaction" step="1"  value="0">
+            <br>
+            <br>
+            <input name="evaluation" type="number" value="0">
+            <br>
+            <br>
+            <input name="number_of_projects" type="number" value="0">
+            <br>
+            <br>
+            <input name="average_monthly_hours" type="number" value="0">
+            <br>
+            <br>
+            <input name="time_spend_company" type="number" value="0">
+            <br>
+            <br>
+            <select name="work_accident">
+                <option>yes</option>
+                <option>no</option>
+            </select>
+            <br>
+            <br>
+            <select name="promotion">
+                <option>yes</option>
+                <option>no</option>
+            </select>
+            <br>
+            <br>
+            <select name="salary">
+                <option>low</option>
+                <option>medium</option>
+                <option>high</option>
+            </select>
+            <br>
+            <br>
+            <select name="department">
+                <option>sales</option>
+                <option>accounting</option>
+                <option>hr</option>
+                <option>technical</option>
+                <option>support</option>
+                <option>management</option>
+                <option>IT</option>
+                <option>product_mng</option>
+                <option>marketing</option>
+                <option>RandD</option>
+            </select>
+            <br>
+            <br>
+            <button type = "submit">submit</button>
+        </form>
+    </section>
 </main>
-
+<img src="./../images/wonderloudly.jpeg" alt="WounderLoudly icon" />
 </body>
 </html>
